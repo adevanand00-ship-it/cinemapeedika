@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -10,7 +10,7 @@ body{
   margin:0;
   font-family:Arial, sans-serif;
   background:#f2f2f2;
-  padding-bottom:90px;
+  padding-bottom:110px;
 }
 
 header{
@@ -29,16 +29,15 @@ header{
   font-weight:bold;
 }
 
-.container{
-  padding:12px;
-}
+.container{ padding:12px; }
 
-select{
+select,input,textarea{
   width:100%;
   padding:10px;
   border-radius:6px;
   border:1px solid #ccc;
-  margin-bottom:12px;
+  margin-bottom:8px;
+  font-size:14px;
 }
 
 .grid{
@@ -54,9 +53,7 @@ select{
   text-align:center;
 }
 
-.product h4{
-  margin:0;
-}
+.product h4{ margin:0; }
 
 .product p{
   font-size:13px;
@@ -87,10 +84,7 @@ select{
   margin-bottom:6px;
 }
 
-.remove{
-  color:red;
-  cursor:pointer;
-}
+.remove{ color:red; cursor:pointer; }
 
 .buy-bar{
   display:none;
@@ -163,6 +157,9 @@ select{
 
 <div class="cart" id="cartBox">
   <h3>🛒 Cart</h3>
+  <input id="custName" placeholder="Customer Name">
+  <input id="custPhone" placeholder="Phone Number">
+  <textarea id="custAddress" placeholder="Delivery Address"></textarea>
   <div id="cartItems"></div>
 </div>
 
@@ -180,57 +177,80 @@ function addToCart(code){
   updateCart();
 }
 
-function removeItem(index){
-  cart.splice(index,1);
+function removeItem(i){
+  cart.splice(i,1);
   updateCart();
 }
 
 function updateCart(){
-  var cartBox = document.getElementById("cartBox");
-  var buyBar = document.getElementById("buyBar");
-  var list = document.getElementById("cartItems");
-  var count = document.getElementById("cartCount");
+  var cartBox=document.getElementById("cartBox");
+  var buyBar=document.getElementById("buyBar");
+  var list=document.getElementById("cartItems");
+  var count=document.getElementById("cartCount");
 
-  list.innerHTML = "";
+  list.innerHTML="";
 
-  if(cart.length === 0){
-    cartBox.style.display = "none";
-    buyBar.style.display = "none";
-  } else {
-    cartBox.style.display = "block";
-    buyBar.style.display = "block";
-
+  if(cart.length===0){
+    cartBox.style.display="none";
+    buyBar.style.display="none";
+  }else{
+    cartBox.style.display="block";
+    buyBar.style.display="block";
     for(var i=0;i<cart.length;i++){
       list.innerHTML +=
-        '<div class="cart-item">' +
-        '<span>Code: ' + cart[i] + '</span>' +
-        '<span class="remove" onclick="removeItem(' + i + ')">✖</span>' +
+        '<div class="cart-item">'+
+        '<span>Code: '+cart[i]+'</span>'+
+        '<span class="remove" onclick="removeItem('+i+')">✖</span>'+
         '</div>';
     }
   }
+  count.innerText=cart.length;
+}
 
-  count.innerText = cart.length;
+function generateInvoice(){
+  var d=new Date();
+  var date=d.getFullYear().toString()+
+           (d.getMonth()+1).toString().padStart(2,'0')+
+           d.getDate().toString().padStart(2,'0');
+  var rand=Math.floor(1000+Math.random()*9000);
+  return "CP-"+date+"-"+rand;
 }
 
 function buyNow(){
-  var msg = "🧾 ORDER INVOICE\n------------------\n";
-  for(var i=0;i<cart.length;i++){
-    msg += (i+1) + ". Code: " + cart[i] + "\n";
-  }
-  msg += "------------------\n";
-  msg += "Total Items: " + cart.length + "\nDelivery:\nContact:\n";
+  if(cart.length===0){ alert("Cart is empty"); return; }
 
-  var phone = "919745039390";
-  window.open("https://wa.me/" + phone + "?text=" + encodeURIComponent(msg), "_blank");
+  var name=document.getElementById("custName").value||"Not Provided";
+  var phoneU=document.getElementById("custPhone").value||"Not Provided";
+  var address=document.getElementById("custAddress").value||"Not Provided";
+
+  var invoice=generateInvoice();
+  var time=new Date().toLocaleString();
+
+  var msg="🧾 *CINEMAPEEDIKA ORDER INVOICE*\n";
+  msg+="------------------------------\n";
+  msg+="Invoice No: "+invoice+"\n";
+  msg+="Date: "+time+"\n";
+  msg+="------------------------------\n";
+
+  for(var i=0;i<cart.length;i++){
+    msg+=(i+1)+". Code: "+cart[i]+"\n";
+  }
+
+  msg+="------------------------------\n";
+  msg+="📦 Total Items: "+cart.length+"\n";
+  msg+="🚚 Delivery Address:\n"+address+"\n";
+  msg+="📞 Customer Phone: "+phoneU+"\n";
+  msg+="👤 Customer Name: "+name+"\n";
+  msg+="------------------------------\nThank you 🙏";
+
+  var admin="919745039390";
+  window.open("https://wa.me/"+admin+"?text="+encodeURIComponent(msg),"_blank");
 }
 
 function filterCategory(cat){
-  var items = document.querySelectorAll(".product");
+  var items=document.querySelectorAll(".product");
   for(var i=0;i<items.length;i++){
-    items[i].style.display =
-      (cat === "all" || items[i].dataset.category === cat)
-      ? "block"
-      : "none";
+    items[i].style.display=(cat==="all"||items[i].dataset.category===cat)?"block":"none";
   }
 }
 </script>
